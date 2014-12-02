@@ -1,25 +1,25 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.13'
-
-# Bundle edge Rails instead:
-# gem 'rails', :git => 'git://github.com/rails/rails.git'
+gem 'rails', '4.1.8'
+gem 'activerecord-deprecated_finders'
+gem 'protected_attributes'
+ruby '2.1.5'
 
 gem 'mysql2'
 
+group :development do
+  gem 'better_errors'
+  gem 'binding_of_caller'
+end
 
 # Gems used only for assets and not required
 # in production environments by default.
-group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
+gem 'sass-rails'
+gem 'coffee-rails'
 
-  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  gem 'therubyracer', :platforms => :ruby
-
-  gem 'uglifier', '>= 1.0.3'
-end
-
+# See https://github.com/sstephenson/execjs#readme for more supported runtimes
+gem 'therubyracer', platforms: :ruby
+gem 'uglifier', '>= 1.0.3'
 gem 'jquery-rails'
 
 # To use ActiveModel has_secure_password
@@ -28,8 +28,8 @@ gem 'jquery-rails'
 # To use Jbuilder templates for JSON
 # gem 'jbuilder'
 
-# Use unicorn as the app server
-# gem 'unicorn'
+# Use puma as the app server
+gem 'puma'
 
 # Deploy with Capistrano
 # gem 'capistrano'
@@ -45,7 +45,7 @@ gem 'paper_trail', '>= 3.0.0.rc2'
 
 # For background work (sending emails)
 gem 'sidekiq'
-gem 'sinatra', '>= 1.3.0', :require => nil
+gem 'sinatra', '>= 1.3.0', require: nil
 
 # For email previewing
 gem 'letter_opener_web'
@@ -60,7 +60,7 @@ gem 'geokit'
 gem 'jquery-ui-rails'
 
 # To use rubyzip
-gem 'rubyzip', "~>1.0.0"
+gem 'rubyzip', '~>1.0.0'
 
 # To use pry for debugging
 gem 'pry'
@@ -77,8 +77,11 @@ gem 'ptools'
 gem 'execjs'
 
 # bootstrap
-gem "less-rails" #Sprockets (what Rails 3.1 uses for its asset pipeline) supports LESS
-gem 'twitter-bootstrap-rails', :git => 'git://github.com/seyhunak/twitter-bootstrap-rails.git', :branch => 'bootstrap3'
+# Sprockets (what Rails 3.1 uses for its asset pipeline) supports LESS
+gem 'less-rails'
+gem 'twitter-bootstrap-rails',
+    git: 'git://github.com/seyhunak/twitter-bootstrap-rails.git',
+    branch: 'bootstrap3'
 
 # For uploading email attacments
 gem 'carrierwave'
@@ -105,3 +108,6 @@ gem 'mechanize'
 # Gem for xlsx creation
 gem 'acts_as_xlsx'
 gem 'axlsx'
+
+# Awesome print
+gem 'awesome_print'

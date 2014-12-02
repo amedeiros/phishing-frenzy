@@ -13,10 +13,12 @@
 //= require jquery
 //= require jquery_ujs
 //= require dataTables/jquery.dataTables
-//= require dataTables/jquery.dataTables.bootstrap3
+//= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+//= require dataTables/jquery.dataTables
 //= require bootstrap.min
 //= require d3
 //= require jquery_nested_form
+//= require jquery-ui
 
 $(document).ready(function() {
   $("[rel~='tooltip']").tooltip();

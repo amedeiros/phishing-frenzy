@@ -6,7 +6,6 @@ class TemplateValidator < ActiveModel::Validator
   end
 
   def multiples_indices?(pages)
-    pages.select{|p| p.function == 'website - index'}.size > 1
+    pages.select { |p| p.function == 'website - index' }.size > 1
   end
-
 end

@@ -14,25 +14,26 @@ class Campaign < ActiveRecord::Base
   has_many :visits, through: :victims
 
   # allow mass asignment
-  attr_accessible :name, :description, :active, :emails, :scope, :template_id, :test_email
+  attr_accessible :name, :description, :active, :emails, :scope,
+                  :template_id, :test_email
 
   # named scopes
-  scope :active, where(:active => true)
-  scope :launched, where(:email_sent => true)
+  scope :active, -> { where(active: true) }
+  scope :launched, -> { where(email_sent: true) }
 
   before_save :parse_email_addresses
-  after_update :devops, :if => :active_changed?
+  after_update :devops, if: :active_changed?
   after_destroy :cleanup_apache
 
   # validate form before saving
-  validates :name, :presence => true,
-            :length => {:maximum => 255}
+  validates :name, presence: true,
+                   length: { maximum: 255 }
   validates :description,
-            :length => {:maximum => 255}
+            length: { maximum: 255 }
   validates :emails,
-            :length => {:maximum => 60000}
-  validates :scope, :numericality => {:greater_than_or_equal_to => 0},
-            :length => {:maximum => 4}, :allow_nil => true
+            length: { maximum: 60_000 }
+  validates :scope, numericality: { greater_than_or_equal_to: 0 },
+                    length: { maximum: 4 }, allow_nil: true
 
   def self.clicks(campaign)
     campaign.visits.where('extra is null OR extra not LIKE ?', "%EMAIL%").pluck(:victim_id).uniq.size
@@ -47,7 +48,7 @@ class Campaign < ActiveRecord::Base
   end
 
   def self.success(campaign)
-    Campaign.sent(campaign) == 0 ? 
+    Campaign.sent(campaign) == 0 ?
         0 : (Campaign.clicks(campaign).to_f / Campaign.sent(campaign).to_f * 100.0).round(2)
   end
 
@@ -91,7 +92,7 @@ class Campaign < ActiveRecord::Base
         # firstname, lastname, email
         parse_triple_csv
       end
-      
+
       # clear the Campaigns.emails holder
       self.update_attribute(:emails, " ")
     end

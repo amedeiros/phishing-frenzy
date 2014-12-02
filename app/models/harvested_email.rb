@@ -9,13 +9,11 @@ class HarvestedEmail < ActiveRecord::Base
   private
 
   def normalize_email
-    self.original = self.email[0]
-    symbol =        self.email[1]
-    if self.email[1].match(/@/)
-      self.email = self.original
+    self.original = email[0]
+    if email[1].match(/@/)
+      self.email = original
     else
-      self.email = self.original.gsub(self.email[1], '@')
+      self.email = original.gsub(email[1], '@')
     end
   end
-
 end

@@ -1,5 +1,4 @@
 class SystemMonitor
-
   # determine if apache is running
   def apache
     apache_output = GlobalSettings.apache_status
@@ -24,13 +23,11 @@ class SystemMonitor
   end
 
   def sidekiq
-    begin
-      pid_file = File.expand_path(File.join(Rails.root, 'tmp', 'pids', 'sidekiq.pid'))
-      pid = File.read(pid_file)
-      Process.getpgid(pid.to_i)
-    rescue Exception => e
-      Rails.logger.error e
-      false
-    end
+    pid_file = File.expand_path(File.join(Rails.root, 'tmp', 'pids', 'sidekiq.pid'))
+    pid = File.read(pid_file)
+    Process.getpgid(pid.to_i)
+  rescue Exception => e
+    Rails.logger.error e
+    false
   end
 end

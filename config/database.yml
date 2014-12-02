@@ -1,5 +1,5 @@
 # MySQL.  Versions 4.1 and 5.0 are recommended.
-# 
+#
 # Install the MYSQL driver
 #   gem install mysql2
 #
@@ -14,8 +14,8 @@ development:
   reconnect: false
   database: pf_dev
   pool: 5
-  username: pf_dev
-  password: password
+  username: root
+  password:
   host: localhost
 
 # Warning: The database defined as "test" will be erased and
@@ -27,8 +27,8 @@ test:
   reconnect: false
   database: pf_test
   pool: 5
-  username: pf_test
-  password: password
+  username: root
+  password:
   host: localhost
 
 production:
