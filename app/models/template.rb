@@ -1,14 +1,17 @@
 class Template < ActiveRecord::Base
+  include PublicActivity::Model
+	tracked owner: ->(controller, model) { controller && controller.current_admin }
+	
+	belongs_to :admin
 	has_many :campaigns
+	has_many :attachments, as: :attachable, dependent: :destroy
 
-	attr_accessible :name, :description, :notes, :attachments_attributes, :directory_index
+	attr_accessible :name, :description, :notes, :attachments_attributes, :directory_index, :admin_id
 
 	validates :name, presence: true, length: { :maximum => 255 }
 	validates_with TemplateValidator
 
-	has_many :attachments, as: :attachable, dependent: :destroy
-
-	accepts_nested_attributes_for :attachments
+	accepts_nested_attributes_for :attachments, :allow_destroy => true , :reject_if => proc {|attributes| attributes['file'].blank?}
 
 	def email_directory
 		File.dirname(email_files.first.file.current_path)
@@ -34,6 +37,10 @@ class Template < ActiveRecord::Base
 		attachments.where(function: 'attachment').all.select do |attachment|
 			attachment.file.url =~ /[jpg|png|gif]$/
 		end
+	end
+
+	def file_attachments
+		attachments.where(function: 'file_attachment')
 	end
 
 	def index_file

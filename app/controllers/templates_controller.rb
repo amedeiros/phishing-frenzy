@@ -6,16 +6,11 @@ class TemplatesController < ApplicationController
 	end
 
 	def list
-		@templates = Template.all
+		@templates = Template.includes(:admin).all
 	end
 
 	def show
 		@template = Template.find_by_id(params[:id])
-		if @template.nil?
-			list
-			render('list')
-		end
-
 		@images = @template.images
 	end
 
@@ -25,6 +20,8 @@ class TemplatesController < ApplicationController
 
 	def create
 		@template = Template.new(params[:template])
+		@template.admin_id = current_admin.id
+
 		if @template.save
 			flash[:notice] = "Template Created"
 			redirect_to(:action => 'list')
@@ -35,31 +32,16 @@ class TemplatesController < ApplicationController
 	end
 
 	def edit
-		@template = Template.find_by_id(params[:id])
-		if @template.nil?
-			list
-			render('list')
-		end
+		@campaign = campaign_present
+		@template = Template.find(params[:id])
 	end
 
 	def update
+		@campaign = campaign_present
+		campaign_id = @campaign.present? ? @campaign.id : nil
 		@template = Template.find(params[:id])
-		attachments = params[:template][:attachments_attributes]
-		unless attachments.nil?
-			attachments.each do |a| 
-				if a[1]["_destroy"].eql? "1"
-					begin
-						@template.attachments.destroy(a[1]["id"])
-						params[:template][:attachments_attributes].delete(a[0])
-					rescue
-						next
-					end
-				end
-			end
-		end
-
 		if @template.update_attributes(params[:template])
-			redirect_to edit_template_path, notice: "Template Updated"
+			redirect_to edit_template_path(campaign_id: campaign_id), notice: "Template Updated"
 		else
 			render('edit')
 		end
@@ -74,12 +56,10 @@ class TemplatesController < ApplicationController
 	end
 
 	def destroy
-		# delete folder if_exists?
-		@template = Template.find_by_id(params[:id])
-
-		Template.find(params[:id]).destroy
-		flash[:notice] = "Template Destroyed"
-		redirect_to templates_path
+		@template = Template.find(params[:id])
+		@template.destroy
+		flash[:warning] = "Template Destroyed"
+		redirect_to list_templates_path
 	end
 
 	def copy
@@ -187,11 +167,25 @@ class TemplatesController < ApplicationController
 	end
 
 	def edit_email
+		@campaign = campaign_present
 		@attachment = Attachment.find(params[:format])
-		attachment_location = File.join(Rails.root.to_s, "public", "uploads", "attachment", "file", params[:format], "*")
-		@attachment_content = File.read(Dir.glob(attachment_location)[0])
+		attachment_location = @attachment.file.current_path
+
+		begin
+			@attachment_content = File.read(Dir.glob(attachment_location)[0])
+
+			unless @attachment_content.is_utf8?
+				flash[:warning] = "Cannot Edit Files that are not UTF-8 sequence"
+				redirect_to :back
+			end
+		rescue
+			flash[:warning] = "Issue Reading Attachment File"
+			redirect_to :back
+			return
+		end
 		if File.binary?(Dir.glob(attachment_location)[0])
-			redirect_to :back, notice: "Cannot Edit Binary Files"
+			flash[:warning] = "Cannot Edit Binary Files"
+			redirect_to :back
 		end
 	end
 
@@ -204,6 +198,10 @@ class TemplatesController < ApplicationController
 	end
 
 private
+
+	def campaign_present
+		params[:campaign_id].present? ? Campaign.find_by_id(params[:campaign_id]) : nil
+	end
 
 	def copy_template(template)
 		# generate random string

@@ -2,6 +2,7 @@ PhishingFramework::Application.routes.draw do
 
 	devise_for :admins
 
+
 	# image tracking routes.
 	get '/reports/image/:uid.png' => 'reports#image'
 
@@ -31,10 +32,10 @@ PhishingFramework::Application.routes.draw do
 			get 'list'
 			get 'aboutus'
 			get 'victims'
+			get 'activity'
 			delete 'destroy'
 		end
 		member do
-			post 'update_settings'
 			post 'clear_victims'
 		end
 	end
@@ -83,18 +84,18 @@ PhishingFramework::Application.routes.draw do
 		end
 	end
 
-  resources :clones do
-  	member do
-  		get 'download'
-  		get 'preview'
-  	end
-  end
+	resources :clones do
+		member do
+			get 'download'
+			get 'preview'
+		end
+	end
 
-  resources :tools
+	resources :tools
 
 	root :to => 'campaigns#home'
 
-	match 'access', :to => 'access#menu', as: 'access'
+	match 'access', :to => 'access#menu', as: 'access', via: :get
 
 	require 'sidekiq/web'
 
@@ -103,10 +104,10 @@ PhishingFramework::Application.routes.draw do
 	end
 
 	require 'sidekiq/api'
-	match "queue-status" => proc { [200, {"Content-Type" => "text/plain"}, [Sidekiq::Queue.new.size < 100 ? "OK" : "UHOH" ]] }
+	match "queue-status" => proc { [200, {"Content-Type" => "text/plain"}, [Sidekiq::Queue.new.size < 100 ? "OK" : "UHOH" ]] }, via: :get
 
 	mount LetterOpenerWeb::Engine, at: 'letter_opener'
 
-	match ':controller(/:action(/:id))(.:format)'
+	match ':controller(/:action(/:id))(.:format)', via: [:get, :post]
 end
 
